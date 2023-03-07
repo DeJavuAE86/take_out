@@ -1,0 +1,49 @@
+package com.li.reggie.config;
+
+import com.li.reggie.utils.JacksonObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+
+import java.util.List;
+
+@Slf4j
+@Configuration
+public class WebMvcConfig extends WebMvcConfigurationSupport {
+
+//    @Autowired
+//    private LoginCheckInterceptor loginCheckInterceptor;
+
+    //放行静态资源
+    @Override
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        log.info("静态资源加载...");
+        registry.addResourceHandler("/backend/**").addResourceLocations("classpath:/backend/");
+        registry.addResourceHandler("/front/**").addResourceLocations("classpath:/front/");
+    }
+
+
+    //扩展消息转换器
+    @Override
+    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+
+        //创建消息转换器对象
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        //设置对象转换器，底层使用Jackson将Java对象转为json
+        converter.setObjectMapper(new JacksonObjectMapper());
+        //将上面的消息转换器追加到mvc框架的转换器集合中
+        converters.add(0,converter);
+    }
+
+
+//    @Override
+//    protected void addInterceptors(InterceptorRegistry registry) {
+//        log.info("拦截到请求...");
+//        registry.addInterceptor(loginCheckInterceptor).addPathPatterns("/*");
+//    }
+}
